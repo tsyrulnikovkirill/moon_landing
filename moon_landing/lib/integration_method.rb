@@ -1,7 +1,7 @@
 require_relative 'constants'
 require_relative 'mathematical_model'
 
-def runge_kutta(arr_parameters, t, t_end, excel)
+def runge_kutta(arr_parameters, t, t_end, d_pitch_dt, pitch_2, excel)
     
     v_x_old = arr_parameters[0]
     v_y_old = arr_parameters[1]
@@ -10,7 +10,7 @@ def runge_kutta(arr_parameters, t, t_end, excel)
     # m_old = arr_parameters[4]
 
     thrust = THRUST_1 #!!!!!
-    h_orbit = H_AMS_1_1
+    h_orbit = H_AMS_1_1s
 
     dt = DELTA_T
 
@@ -21,11 +21,13 @@ def runge_kutta(arr_parameters, t, t_end, excel)
 
     while t < t_end
         
-        # y_old < h_orbit#(y_old - h_orbit).abs > 10 ** (-8) 
-
         # левая граница отсечки тяги
         if t + dt > t_end
             dt = t_end - t
+        end
+
+        if (y_old - h_orbit).abs < 10 ** (-7) 
+            break
         end
 
         # надо пересчитывать тангаж, так как она зависит от времени
@@ -63,26 +65,28 @@ def runge_kutta(arr_parameters, t, t_end, excel)
         y_new = y_old + (k_y_1 + 2 * k_y_2 + 2 * k_y_3 + k_y_4) / 6
         # m_new = m_old + (k_m_1 + 2 * k_m_2 + 2 * k_m_3 + k_m_4) / 6
 
-        
-        v_x_old = v_x_new
-        v_y_old = v_y_new
-        x_old = x_new
-        y_old = y_new
-        # m_old = m_new
+
+        if y_new > h_orbit
+            dt = dt * 0.5
+        else
+            v_x_old = v_x_new
+            v_y_old = v_y_new
+            x_old = x_new
+            y_old = y_new
+            # m_old = m_new
+
+            t += dt
+            t = t.round(6)
+            dt = DELTA_T
+    
+            # if t % 0.5 == 0.0 or t == t_end
+                parameters = issue_parameters(t, v_x_old, v_y_old, x_old, y_old, pitch_angle)
+                excel.create_line(parameters)
+            # end
+        end
 
         
-
-        t += dt
-        t = t.round(6)
-        dt = DELTA_T
-
-        # if t % 0.5 == 0.0 or t == t_end
-            parameters = issue_parameters(t, v_x_old, v_y_old, x_old, y_old, pitch_angle)
-            excel.create_line(parameters)
-        # end
     end
 
-
-
-    return [v_x_old, v_y_old, x_old, y_old, t]
+    return [v_x_old, v_y_old, x_old, y_old, t, parameters]
 end

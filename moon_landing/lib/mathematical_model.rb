@@ -101,5 +101,4 @@ def issue_parameters(t, v_x, v_y, x, y, pitch_angle)
     ]
 end
 
-# puts DELTA_T - (t + dt % DELTA_T).round(4) % DELTA_T
 
