@@ -1,5 +1,6 @@
 require_relative 'lib/mathematical_model'
 require_relative 'lib/integration_method'
+require_relative 'lib/integration_method_old'
 require_relative 'lib/excel_data'
 require_relative 'lib/constants'
 require_relative 'lib/discrepancy'
@@ -8,8 +9,11 @@ require_relative 'lib/discrepancy'
 excel = ExcelData.new()
 
 
-discrepancy(D_PITCH_DT, PITCH_2, excel)
+# discrepancy(D_PITCH_DT, PITCH_2, excel)
 
+calculate(H_AMS_1_1, D_PITCH_DT, PITCH_2, excel)
+
+# время граничное попадает на два интервала
 
 excel.create_sheet("_res_")
 excel.clean
